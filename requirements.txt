@@ -1,0 +1,8 @@
+certifi         
+charset-normalizer
+idna              
+pip                
+requests         
+setuptools      
+urllib3         
+wget
