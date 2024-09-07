@@ -81,7 +81,7 @@ class PlexUpdater:
     def retrieve_version_data(self):
         if self.get_plex_token() is False:
             self.header_fail('Token is unable')
-            raise
+            sys.exit(0)
         else:
             try:
                 plex_url = f"https://plex.tv/api/downloads/5.json?channel=plexpass&X-Plex-Token={self.get_plex_token()}"
@@ -90,10 +90,10 @@ class PlexUpdater:
                 data_json = response.json()
             except requests.exceptions.HTTPError as http_err:
                 self.header_fail(f"HTTP error occurred: {http_err}")
-                raise
+                sys.exit(0)
             except Exception as err:
                 self.header_fail(f"Other error occurred: {err}")
-                raise
+                sys.exit(0)
         return data_json
 
     def get_os_version(self):
@@ -116,7 +116,7 @@ class PlexUpdater:
             return syno_os_version
         except IOError:
             self.header_fail("File {} not found".format(file_version))
-            raise
+            sys.exit(0)
 
     def get_cpu_arch(self):
         """
@@ -169,7 +169,7 @@ class PlexUpdater:
                     url = build["url"]
         except KeyError as error:
             self.header_fail(f"KeyError: {error}")
-            raise
+            sys.exit(0)
         return url
 
     def verify_plex_version_is_up_to_date(self):
@@ -179,12 +179,14 @@ class PlexUpdater:
         Returns:
             bool: True if the Plex version is up to date, False otherwise.
         """
+        
         if self.get_available_version() != self.get_installed_version():
             print("New plex version available...downloading")
             result = self.download_new_version()
             return result
         else:
-            PlexUpToDateException(self.result("Plex is up to date"))
+            self.result("Plex is up to date")
+            sys.exit(0)
     
     def download_new_version(self):
         """
@@ -193,15 +195,13 @@ class PlexUpdater:
         Raises:
             ValueError: If the URL package is not found.
         """
-        try:
-            spk_file = self.get_url_package()
-            if spk_file is None:
-                raise ValueError("URL package not found for the specified CPU architecture and Synology OS version")
-            wget.download(spk_file)
-            print('\n')
-        except Exception as e:
-            self.header_fail(f"Failed to download new version: {e}")
-            raise
+        
+        spk_file = self.get_url_package()
+        if spk_file is None:
+            self.header_fail("Failed to download new version: URL package not found for the specified CPU architecture and Synology OS version")
+            sys.exit(0)
+        wget.download(spk_file)
+        print('\n')
        
     def get_package_name(self):
         """
@@ -229,7 +229,7 @@ class PlexUpdater:
             self.result("Package successfully installed")
         except subprocess.CalledProcessError:
            self.header_fail("Error to download package")
-           raise
+           sys.exit(0)
 
     def stop_plex_service(self):
         """
@@ -246,7 +246,7 @@ class PlexUpdater:
             self.result("Plex server stop successfull")
         except subprocess.CalledProcessError:
            self.header_fail("Error to stop plex server")
-           raise
+           sys.exit(0)
 
 
     def start_plex_service(self):
@@ -264,7 +264,7 @@ class PlexUpdater:
             self.result("Plex server start successfull")
         except subprocess.CalledProcessError:
            self.header_fail("Error to start plex server")
-           raise
+           sys.exit(0)
     
     def clean_directory(self):
         """
@@ -282,7 +282,7 @@ class PlexUpdater:
             self.result("Directory clean successfully")
         except subprocess.CalledProcessError:
            self.header_fail("Directory not cleaned")
-           raise
+           sys.exit(0)
 
     def search_file_for_retrieve_token(self, filename, search_path):
         """
