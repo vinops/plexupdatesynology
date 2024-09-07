@@ -7,6 +7,9 @@ from xml.dom import minidom
 import platform
 import requests
 
+class PlexUpToDateException(Exception):
+    pass
+
 class PlexUpdater:
 
     def __init__(self, xml_file):
@@ -181,8 +184,7 @@ class PlexUpdater:
             result = self.download_new_version()
             return result
         else:
-            result = self.result("Plex is up to date")
-            raise
+            PlexUpToDateException(self.result("Plex is up to date"))
     
     def download_new_version(self):
         """
@@ -197,9 +199,6 @@ class PlexUpdater:
                 raise ValueError("URL package not found for the specified CPU architecture and Synology OS version")
             wget.download(spk_file)
             print('\n')
-        except ValueError as e:
-            self.header_fail(str(e))
-            raise
         except Exception as e:
             self.header_fail(f"Failed to download new version: {e}")
             raise

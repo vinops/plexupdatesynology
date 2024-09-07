@@ -13,8 +13,8 @@ On your NAS, navigate to the **SynoPlexUpdater** project and execute the **set_e
 - Create schedule task on your NAS, Go to **Control Panel > Task Scheduler**, click **Create** and select **Scheduled Task**. 
     In the text box **Execute the command**, adapt **you_path** according to where the script will be launched.
     ```bash
-        source /you_path/venv/bin/activate &&
-        python /you_path/plex_updater.py
+        source /you_path/SynoPlexUpdater/venv/bin/activate &&
+        python /you_path/SynoPlexUpdater/plex_updater.py
     ```
     and schedule time **for example you can shedule task at 7:00AM all the days**
 
